@@ -1,63 +1,91 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 
+// Function to check if a character is an operand (letter or digit)
 bool isOperand(char c) {
-    return (c >= 'A' && c <= 'Z') ||  // Check if uppercase letter
-           (c >= 'a' && c <= 'z') ||  // Check if lowercase letter
-           (c >= '0' && c <= '9');    // Check if digit
-}
-int priorityValue(char c){
-	if(c=='^') return 3;
-	else if(c=='*' || c=='/') return 2;
-	else if(c=='+' || c=='-') return 1;
-	else return -1;
+    return (c >= 'A' && c <= 'Z') ||  // Uppercase letters
+           (c >= 'a' && c <= 'z') ||  // Lowercase letters
+           (c >= '0' && c <= '9');    // Digits
 }
 
-string infixToPostfix(string s){
-	stack<char>st;
-	string result="";
-	for(char c : s){
-		if(isOperand(c)){
-			result+=c;
-		}else if(c=='('){
-			st.push(c);
-		}else if(c==')'){
-			while(!st.empty() && st.top()!='('){
-				result+=st.top();
-				st.pop();
-			}
-			st.pop();
-		}else{
-			while(!st.empty() && priorityValue(c) <= priorityValue(st.top())){
-				result+=st.top();
-				st.pop();
-			}
-			st.push(c);
-		}
-	}
-	while(!st.empty()){
-			result+=st.top();
-			st.pop();
-	}
-	return result;
+// Function to return priority of an operator
+int priorityValue(char c) {
+    if (c == '^') return 3;
+    else if (c == '*' || c == '/') return 2;
+    else if (c == '+' || c == '-') return 1;
+    else return -1; // For non-operators
 }
 
-int main(){
-	string s;
-	cin>>s;
-	cout<<infixToPostfix(s);
+// Function to convert infix expression to postfix
+string infixToPostfix(string s) {
+    stack<char> st;    // Stack to store operators
+    string result = ""; // Final postfix expression
+
+    for (char c : s) {
+        if (isOperand(c)) {
+            // If operand, add to result
+            result += c;
+        }
+        else if (c == '(') {
+            // Push '(' to stack
+            st.push(c);
+        }
+        else if (c == ')') {
+            // Pop until '(' is found
+            while (!st.empty() && st.top() != '(') {
+                result += st.top();
+                st.pop();
+            }
+            st.pop(); // Remove '(' from stack
+        }
+        else {
+            // For operators: pop operators from stack with higher or equal precedence
+            while (!st.empty() && priorityValue(c) <= priorityValue(st.top())) {
+                result += st.top();
+                st.pop();
+            }
+            st.push(c);
+        }
+    }
+
+    // Pop all remaining operators from stack
+    while (!st.empty()) {
+        result += st.top();
+        st.pop();
+    }
+
+    return result;
 }
 
+int main() {
+    string s = "a+b*c";
+    cin >> s; // Read infix expression (no spaces)
+    cout << infixToPostfix(s);
+}
 
-//    Time Complexity (TC):   
-// 1.  Iterating through the string:   ( O(N)  )  
-// 2.  Stack operations (push/pop for operators):  Each operator is pushed once and popped once →  ( O(N)  )  
-// 3.  Final stack emptying:   ( O(N)  ) in the worst case  
+/*
+Time Complexity:
+- Iterates through N characters → O(N)
+- Each operator pushed and popped at most once → O(N)
+- Final stack emptying → O(N)
+Overall: O(N)
 
-//Overall Time Complexity:  ( O(N)  )   
+Space Complexity:
+- Stack may store up to O(N) operators
+- Result string stores O(N) characters
+Overall: O(N)
 
-//    Space Complexity (SC):   
-// 1.  Stack usage:  In the worst case (fully parenthesized expressions like `((a+b)*(c-d))`), the stack holds  O(N)  elements.  
-// 2.  Result string storage:   ( O(N)  ) (since it stores the postfix expression).  
+------------------------------
+Sample Input 1:
+a+b*c
 
-//Overall Space Complexity:  ( O(N)  )   
+Sample Output 1:
+abc*+
+
+Sample Input 2:
+(a+b)*(c-d)
+
+Sample Output 2:
+ab+cd-*
+------------------------------
+*/
