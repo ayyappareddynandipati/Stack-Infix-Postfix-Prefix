@@ -1,52 +1,68 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 
+// Function to check if the character is an operand (letter or digit)
 bool isOperand(char c) {
-    return (c >= 'A' && c <= 'Z') ||  // Check if uppercase letter
-           (c >= 'a' && c <= 'z') ||  // Check if lowercase letter
-           (c >= '0' && c <= '9');    // Check if digit
+    return (c >= 'A' && c <= 'Z') ||  // Uppercase letters
+           (c >= 'a' && c <= 'z') ||  // Lowercase letters
+           (c >= '0' && c <= '9');    // Digits
 }
 
-string postfixToInfix(string s){
-	stack<string>st;
-	for(char c : s){
-		if(isOperand(c)){
-			st.push(string(
-			    1,c));
-		}else{
-			string a = st.top();
-			st.pop();
-			string b = st.top();
-			st.pop();
-			string res = '(' + b + c + a + ')';
-			st.push(res);
-		}
-	}
-	return st.top();
+// Function to convert a postfix expression to infix
+string postfixToInfix(string s) {
+    stack<string> st;
+
+    // Traverse each character of the postfix expression
+    for (char c : s) {
+        if (isOperand(c)) {
+            // If it's an operand, push it as a string
+            st.push(string(1, c));
+        } 
+        else {
+            // If it's an operator, pop two operands from stack
+            string a = st.top(); st.pop();
+            string b = st.top(); st.pop();
+
+            // Combine into a valid infix expression with parentheses
+            string res = '(' + b + c + a + ')';
+
+            // Push the new expression back to stack
+            st.push(res);
+        }
+    }
+
+    // The final element in the stack is the complete infix expression
+    return st.top();
 }
-int main(){
-	string s;
-	cin>>s;
-	cout<<postfixToInfix(s);
+
+int main() {
+    string s;
+    cin >> s; // Read postfix expression without spaces
+    cout << postfixToInfix(s);
 }
 
-//    Time Complexity (TC):   
-// - You  iterate through the string  once →   ( O(N)  )   
-// -  For each operand (isOperand(c))  → Push onto the stack  (O(1))   
-// -  For each operator (`+`, `-`, `*`, etc.) :  
-//   - Pop  two  elements  (O(1))   
-//   - Construct a new infix string →  O(1) amortized  (string concatenation in C++ is optimized).  
-//   - Push back onto the stack  (O(1))   
+/*
+Time Complexity:
+- Traverse input string once: O(N)
+- Push and pop operations on stack: O(1) each
+Overall: O(N)
 
-//  Overall Time Complexity:  ( O(N)  )   
+Space Complexity:
+- Stack holds at most O(N) strings
+- Final string size is O(N)
+Overall: O(N)
 
-//    Space Complexity (SC):   
-// -  Stack stores at most O(N) substrings  in the worst case.  
-// -  Each operand contributes O(1) space initially .  
-// -  Each operator combines two strings into one , leading to  O(N) space in the worst case .  
+------------------------------
+Sample Input 1:
+ab+c*
 
-//   Overall Space Complexity:  ( O(N)  )   
+Sample Output 1:
+((a+b)*c)
 
-//    Final Complexity Summary:   
-// -  Time Complexity:   ( O(N)  )  
-// -  Space Complexity:   ( O(N)  )  
+Sample Input 2:
+abc*+de/-
+
+Sample Output 2:
+((a+(b*c))-(d/e))
+------------------------------
+*/
