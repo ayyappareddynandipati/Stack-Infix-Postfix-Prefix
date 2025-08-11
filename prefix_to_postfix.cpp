@@ -1,49 +1,70 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Function to check if a character is an operand (letter or digit)
 bool isOperand(char c) {
-    return (c >= 'A' && c <= 'Z') ||  // Check if uppercase letter
-           (c >= 'a' && c <= 'z') ||  // Check if lowercase letter
-           (c >= '0' && c <= '9');    // Check if digit
+    return (c >= 'A' && c <= 'Z') ||  // Uppercase letter
+           (c >= 'a' && c <= 'z') ||  // Lowercase letter
+           (c >= '0' && c <= '9');    // Digit
 }
 
-string prefixToPostfix(string s){
-	stack<string>st;
-	for(int i=s.size()-1;i>=0;i--){
-		char c = s[i];
-		if(isOperand(c)){
-			st.push(string(1,c));
-		}else{
-			string a = st.top();
-			st.pop();
-			string b = st.top();
-			st.pop();
-			string res = a + b + c;
-			st.push(res);
-		}
-	}
-	return st.top();
+// Function to convert prefix expression to postfix
+string prefixToPostfix(string s) {
+    stack<string> st;
+
+    // Traverse the prefix expression from right to left
+    for (int i = s.size() - 1; i >= 0; i--) {
+        char c = s[i];
+
+        if (isOperand(c)) {
+            // If it's an operand, push it to the stack
+            st.push(string(1, c));
+        }
+        else {
+            // If it's an operator, pop two operands from the stack
+            string a = st.top(); st.pop();
+            string b = st.top(); st.pop();
+
+            // Combine in postfix form: operand1 operand2 operator
+            string res = a + b + c;
+
+            // Push the result back onto the stack
+            st.push(res);
+        }
+    }
+
+    // The final postfix expression will be at the top of the stack
+    return st.top();
 }
-int main(){
-	string s;
-	cin>>s;
-	cout<<prefixToPostfix(s);
+
+int main() {
+    string s;
+    cin >> s; // Read prefix expression without spaces
+    cout << prefixToPostfix(s);
 }
 
-//    Time Complexity (TC) 
-// -  You iterate through the string once →  ( O(N)  ) 
-// -  Each operand is pushed once →  ( O(1)  ) 
-// -  Each operator pops two elements and pushes one →  ( O(1)  ) 
+/*
+Time Complexity:
+- Scan input once → O(N)
+- Push/pop operations → O(1) each
+Overall: O(N)
 
-//  Overall Time Complexity:  ( O(N)  )   
+Space Complexity:
+- Stack can hold up to O(N) strings
+- Final postfix expression length O(N)
+Overall: O(N)
 
-//    Space Complexity (SC) 
-// -  Stack stores at most O(N) substrings in the worst case .
-// -  Each operand contributes O(1) space initially .
-// -  Each operator combines two strings into one, leading to O(N) space in the worst case .
+------------------------------
+Sample Input 1:
+*+abc
 
-//  Overall Space Complexity:  ( O(N)  )   
+Sample Output 1:
+ab+c*
 
-//    Final Complexity Summary 
-// -   Time Complexity:  ( O(N)  )   
-// -   Space Complexity:  ( O(N)  )   
+Sample Input 2:
+-+a*bc/de
+
+Sample Output 2:
+abc*+de/-
+------------------------------
+*/
